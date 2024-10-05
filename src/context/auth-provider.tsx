@@ -35,7 +35,6 @@ export const AuthProvider = ({ children }: Props) => {
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

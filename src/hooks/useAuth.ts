@@ -26,17 +26,22 @@ export const useAuth = () => {
   };
 
   const register = async (creds: TRegister) => {
-    return await axios
-      .post(`${API_URL}/auth/register`, creds)
-      .then((res) => {
-        if (res.data?.data && res.data.data?.token) addUser(res.data.data);
-        return res.data as AuthResponse;
-      })
-      .catch((err) => {
-        if (err && err?.response && err.response?.data)
-          return { ...err.response.data, success: false } as AuthResponse;
-        else return err as AuthResponse;
-      });
+    try {
+      const response = await axios.post(`${API_URL}/auth/register`, creds);
+      if (response.status === 200) {
+        return {
+          data: response.data,
+          success: true,
+          message: "Registration successful!",
+        } as AuthResponse;
+      }
+    } catch (error) {
+      return {
+        data: undefined,
+        success: false,
+        message: "Registration failed!",
+      } as AuthResponse;
+    }
   };
 
   const login = async (creds: TLogin) => {

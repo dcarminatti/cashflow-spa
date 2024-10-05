@@ -15,24 +15,16 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeButton } from "@/components/theme/theme-button";
 import { useAuth } from "@/hooks/useAuth";
-import type { TLogin } from "@/lib/types/auth";
+import type { TLogin, TRegister } from "@/lib/types/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { useUser } from "@/hooks/useUser";
 
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState("login");
-  const { login } = useAuth();
-  const { user } = useUser();
+  const { login, register } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (user) {
-      router.push("/dashboard");
-    }
-  }, [user]);
-
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmitLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     const values: TLogin = {
       email: (event.currentTarget as HTMLFormElement).email.value,
@@ -42,7 +34,24 @@ export default function AuthPage() {
     const response = await login(values);
     if (response?.success) {
       toast.success(response.message);
-      router.push("/");
+      router.push("/dashboard");
+    } else {
+      toast.error(response?.message);
+    }
+  };
+
+  const handleSubmitRegister = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const values: TRegister = {
+      email: (event.currentTarget as HTMLFormElement).email.value,
+      password: (event.currentTarget as HTMLFormElement).password.value,
+      name: (event.currentTarget as HTMLFormElement).name.value,
+    };
+
+    const response = await register(values);
+    if (response?.success) {
+      toast.success(response.message);
+      setActiveTab("login");
     } else {
       toast.error(response?.message);
     }
@@ -74,7 +83,7 @@ export default function AuthPage() {
               <TabsTrigger value="register">Register</TabsTrigger>
             </TabsList>
             <TabsContent value="login">
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmitLogin} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -94,23 +103,28 @@ export default function AuthPage() {
               </form>
             </TabsContent>
             <TabsContent value="register">
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmitRegister} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="register-email">Email</Label>
+                  <Label htmlFor="name">Name</Label>
+                  <Input id="name" required placeholder="John Doe" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
                   <Input
-                    id="register-email"
+                    id="email"
                     type="email"
                     placeholder="m@example.com"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="register-password">Password</Label>
-                  <Input id="register-password" type="password" required />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
-                  <Input id="confirm-password" type="password" required />
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    required
+                    placeholder="********"
+                  />
                 </div>
                 <Button type="submit" className="w-full">
                   Register

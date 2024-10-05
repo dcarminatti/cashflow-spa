@@ -1,15 +1,12 @@
 import { Transaction } from "./transaction";
+import { AccountType } from "./account-type";
 
 export type BankAccount = {
-  id: string;
+  id: number | null;
+  accountBankName: string;
   accountAgency: string;
   accountNumber: string;
   accountBalance: number;
   accountType: AccountType;
   transactions: List<Transaction>;
 };
-
-export enum AccountType {
-  SAVINGS = "SAVINGS",
-  CURRENT = "CURRENT",
-}
